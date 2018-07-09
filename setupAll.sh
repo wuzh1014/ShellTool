@@ -5,9 +5,11 @@ host=$1
 port=$2
 user=$3
 password=$4
-yum remove -y mariadb-server mariadb
 yum install -y nginx redis git screen mariadb mariadb-server npm golang sshpass wget libevent expect
-sshpass -p $password ssh $user@$host -o GSSAPIAuthentication=no "/data/command/./changeRoot.sh;cp /etc/nginx/nginx.conf /data/conf;cp /etc/sbsocks/config.json /data/conf;tar -czPf /data/all.tar.gz /data/*;"
+sshpass -p $password ssh $user@$host -o GSSAPIAuthentication=no "/data/command/./changeRoot.sh;\\cp -f /etc/nginx/nginx.conf /data/conf/nginx.conf;\\cp -f /etc/sbsocks/config.json /data/conf;"
+sshpass -p $password ssh $user@$host "/data/command/./changeRoot.sh;mysqldump --default-character-set=utf8 -uroot -p123456 --all-databases > /data/sql/cus_project_sruct.sql"
+sshpass -p $password ssh $user@$host "/data/command/./changeRoot.sh;\\cp -f ~/.ssh/* /data/ssh/;"
+sshpass -p $password ssh $user@$host "/data/command/./changeRoot.sh;tar -czPf /data/all.tar.gz /data/*;"
 
 mkdir /data;cd /data
 
@@ -15,15 +17,15 @@ if [ -e "/data/all.tar.gz" ];then
 	echo "all文件存在"
 else
 	wget http://$host:$port/all.tar.gz -O all.tar.gz
-	sshpass -p $password ssh root@$host "rm -rf /data/all.tar.gz"
+	sshpass -p $password ssh $user@$host "/data/command/./changeRoot.sh;rm -rf /data/all.tar.gz"
 fi
 
-cp all.tar.gz all_slave.tar.gz
+\cp -f all.tar.gz all_slave.tar.gz
 tar -xzvPf all_slave.tar.gz
 rm -rf all_slave.tar.gz
 
 mkdir -p /etc/nginx
-cp -f /data/conf/nginx.conf /etc/nginx/nginx.conf
+\cp -f /data/conf/nginx.conf /etc/nginx/nginx.conf
 
 
 which "pip" > /dev/null
@@ -60,6 +62,7 @@ mkdir /github;cd /github
 git clone https://github.com/wuzh1014/cusProject.git
 git clone https://github.com/wuzh1014/cusVueProject.git
 git clone https://github.com/wuzh1014/ShellTool.git
+git clone git://github.com/nicolasff/webdis.git
 
 #https://raw.githubusercontent.com/wuzh1014/ShellTool/master/setupAll.sh
 
@@ -131,7 +134,7 @@ if [[ "$pid" != "" ]];then
 	echo $pid
 	kill -9 $pid
 fi
-cd /data/webdis
+cd /github/webdis;make
 nohup /data/webdis/./webdis >/dev/null &
 
 rm -rf /data/all.tar.gz
