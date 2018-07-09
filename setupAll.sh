@@ -5,7 +5,7 @@ host=$1
 port=$2
 user=$3
 password=$4
-yum install -y nginx redis git screen mysql npm golang sshpass wget libevent expect
+yum install -y nginx redis git screen mariadb mariadb-server npm golang sshpass wget libevent expect
 sshpass -p $password ssh $user@$host -o GSSAPIAuthentication=no "/data/command/./changeRoot.sh;cp /etc/nginx/nginx.conf /data/conf;cp /etc/sbsocks/config.json /data/conf;tar -czPf /data/all.tar.gz /data/*;"
 
 mkdir /data;cd /data
@@ -34,8 +34,10 @@ else
 	python /data/conf/get-pip.py
 fi
 
-
 chmod 777 /data/command/changeRoot.sh
+chmod 666 /data/ssh/*
+chown root:root /data/ssh/*
+
 
 pip uninstall -y shadowsocks
 pip install shadowsocks
@@ -44,7 +46,14 @@ mkdir /etc/shadowsocks
 mv /etc/shadowsocks /etc/sbsocks
 cp -f /data/conf/config.json /etc/sbsocks/config.json
 
+
 cp /data/ssh/* ~/.ssh
+chmod 600 ~/.ssh/*
+eval `ssh-agent -s`
+ssh-add ~/.ssh/id_rsa
+ssh-add ~/.ssh/id_rsa_com
+ssh-add ~/.ssh/id_rsa_mac
+
 
 mkdir /github;cd /github
 git clone https://github.com/wuzh1014/cusProject.git
@@ -60,7 +69,23 @@ nginx -s reload
 systemctl restart redis
 /usr/bin/sbserver -c /etc/sbsocks/config.json -d restart
 systemctl start mariadb
-#flush privileges
+
+echo '#!/usr/bin/expect
+set timeout 60
+set password [lindex $argv 0]
+spawn mysql_secure_installation
+expect {
+"remotely" { send "n\r"; exp_continue}
+"enter for none" { send "\r"; exp_continue}
+"Y/n" { send "Y\r" ; exp_continue}
+"password" { send "$password\r"; exp_continue}
+"Cleaning up" { send "\r"}
+}
+interact ' > auto_mysql_secure.sh
+chmod +x auto_mysql_secure.sh
+./auto_mysql_secure.sh 123456
+rm -rf auto_mysql_secure.sh
+mysqladmin -uroot -p123456 flush privileges
 
 pid=`ps aux | grep node | grep -v grep | awk '{print \$2}'`
 if [[ "$pid" != "" ]];then
