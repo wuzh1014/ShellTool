@@ -20,9 +20,7 @@ if [ -e "/data/all.tar.gz" ];then
 	echo "all文件存在"
 else
 	wget http://$host:$port/all.tar.gz -O all.tar.gz
-	sshpass -p $password ssh $user@$host "/data/command/./changeRoot.sh;rm -rf /data/all.tar.gz"
-	rm -rf /data/all.tar.gz
-	exit
+	sshpass $sshCommand $password ssh $user@$host "rm -rf /data/all.tar.gz"
 fi
 
 \cp -f all.tar.gz all_slave.tar.gz
