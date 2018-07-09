@@ -5,7 +5,7 @@ host=$1
 port=$2
 user=$3
 password=$4
-yum remove -y mariadb-server
+yum remove -y mariadb-server mariadb
 yum install -y nginx redis git screen mariadb mariadb-server npm golang sshpass wget libevent expect
 sshpass -p $password ssh $user@$host -o GSSAPIAuthentication=no "/data/command/./changeRoot.sh;cp /etc/nginx/nginx.conf /data/conf;cp /etc/sbsocks/config.json /data/conf;tar -czPf /data/all.tar.gz /data/*;"
 
@@ -80,7 +80,7 @@ expect {
 "remotely" { send "n\r"; exp_continue}
 "enter for none" { send "\r"; exp_continue}
 "Y/n" { send "Y\r" ; exp_continue}
-"password" { send "$password\r"; exp_continue}
+"password" { send "$password"; exp_continue}
 "Cleaning up" { send "\r"}
 }
 interact ' > auto_mysql_secure.sh
