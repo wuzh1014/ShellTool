@@ -5,8 +5,14 @@ host=$1
 port=$2
 user=$3
 password=$4
+sshCommand=""
 yum install -y nginx redis git screen mariadb mariadb-server npm golang sshpass wget libevent expect libevent-devel
-sshpass -p $password ssh $user@$host -o GSSAPIAuthentication=no "/data/command/./changeRoot.sh;"
+
+if [[ "$password" != "" ]];then
+	sshCommand="-p"
+fi
+sshpass $sshCommand $password ssh $user@$host -o GSSAPIAuthentication=no "/data/command/./changeRoot.sh;"
+
 \cp -f /etc/nginx/nginx.conf /data/conf/nginx.conf;\cp -f /etc/sbsocks/config.json /data/conf;\cp -f ~/.ssh/* /data/ssh/;
 mysqldump --default-character-set=utf8 -uroot -p123456 --all-databases > /data/sql/cus_project_sruct.sql
 tar -czPf /data/all.tar.gz /data/*;exit;
