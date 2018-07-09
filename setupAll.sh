@@ -135,6 +135,6 @@ if [[ "$pid" != "" ]];then
 	kill -9 $pid
 fi
 cd /github/webdis;make
-nohup /data/webdis/./webdis >/dev/null &
+nohup /github/webdis/./webdis >/dev/null &
 
 rm -rf /data/all.tar.gz
