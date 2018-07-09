@@ -77,10 +77,15 @@ set timeout 60
 set password [lindex $argv 0]
 spawn mysql_secure_installation
 expect {
-"remotely" { send "n\r"; exp_continue}
-"enter for none" { send "\r"; exp_continue}
-"Y/n" { send "Y\r" ; exp_continue}
-"password" { send "$password"; exp_continue}
+"Disallow root login remotely" { send "n\r"; exp_continue}
+"Access denied for user" { send "123456\r"; exp_continue}
+"Enter current password for root" { send "\r"; exp_continue}
+"Change the root password" { send "Y\r" ; exp_continue}
+"New password" { send "$password\r"; exp_continue}
+"Re-enter new password" { send "$password\r"; exp_continue}
+"Remove anonymous users" { send "Y\r"; exp_continue}
+"Remove test database and access to it" { send "Y\r"; exp_continue}
+"Reload privilege tables now" { send "Y\r"; exp_continue}
 "Cleaning up" { send "\r"}
 }
 interact ' > auto_mysql_secure.sh
@@ -90,6 +95,7 @@ rm -rf auto_mysql_secure.sh
 
 systemctl restart mariadb
 mysqladmin -uroot -p123456 flush privileges
+mysql --default-character-set=utf8 -uroot -p123456 < /data/sql/cus_project_sruct.sql
 
 pid=`ps aux | grep node | grep -v grep | awk '{print \$2}'`
 if [[ "$pid" != "" ]];then
