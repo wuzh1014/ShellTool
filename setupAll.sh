@@ -85,6 +85,8 @@ interact ' > auto_mysql_secure.sh
 chmod +x auto_mysql_secure.sh
 ./auto_mysql_secure.sh 123456
 rm -rf auto_mysql_secure.sh
+
+systemctl restart mariadb
 mysqladmin -uroot -p123456 flush privileges
 
 pid=`ps aux | grep node | grep -v grep | awk '{print \$2}'`
@@ -124,4 +126,4 @@ fi
 cd /data/webdis
 nohup /data/webdis/./webdis >/dev/null &
 
-# rm -rf /data/all.tar.gz
+rm -rf /data/all.tar.gz
