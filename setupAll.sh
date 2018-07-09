@@ -1,24 +1,21 @@
 #! /bin/bash
 #
-# centos 7
+# CentOS 7
 host=$1
 port=$2
-user=$3
-password=$4
+user="root"
+password=$3
 sshCommand=""
 yum install -y nginx redis git screen mariadb mariadb-server npm golang sshpass wget libevent expect libevent-devel
-
 if [[ "$password" != "" ]];then
 	sshCommand="-p"
 fi
-sshpass $sshCommand $password ssh $user@$host -o GSSAPIAuthentication=no "/data/command/./changeRoot.sh;"
-
-\cp -f /etc/nginx/nginx.conf /data/conf/nginx.conf;\cp -f /etc/sbsocks/config.json /data/conf;\cp -f ~/.ssh/* /data/ssh/;
-mysqldump --default-character-set=utf8 -uroot -p123456 --all-databases > /data/sql/cus_project_sruct.sql
-tar -czPf /data/all.tar.gz /data/*;exit;
+sshpass $sshCommand $password ssh $user@$host -o GSSAPIAuthentication=no "\cp -f /etc/nginx/nginx.conf /data/conf/nginx.conf;\cp -f /etc/sbsocks/config.json /data/conf";
+sshpass $sshCommand $password ssh $user@$host "\cp -f ~/.ssh/* /data/ssh/";
+sshpass $sshCommand $password ssh $user@$host "mysqldump --default-character-set=utf8 -uroot -p123456 --all-databases > /data/sql/cus_project_sruct.sql";
+sshpass $sshCommand $password ssh $user@$host "tar -czPf /data/all.tar.gz /data/*";
 
 mkdir /data;cd /data
-
 if [ -e "/data/all.tar.gz" ];then
 	echo "all文件存在"
 else
