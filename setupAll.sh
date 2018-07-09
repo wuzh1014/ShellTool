@@ -46,7 +46,7 @@ cp /data/ssh/* ~/.ssh
 mkdir /github;cd /github
 git clone https://github.com/wuzh1014/cusProject.git
 git clone https://github.com/wuzh1014/cusVueProject.git
-git clone https://github.com/wuzh1014/setupAll.git
+git clone https://github.com/wuzh1014/ShellTool.git
 
 #https://raw.githubusercontent.com/wuzh1014/ShellTool/master/setupAll.sh
 
