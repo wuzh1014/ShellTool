@@ -3,9 +3,10 @@
 # centos 7
 host=$1
 port=$2
-password=$3
-yum install -y nginx redis git screen mysql npm golang sshpass wget libevent
-sshpass -p $password ssh root@$host -o GSSAPIAuthentication=no "cp /etc/nginx/nginx.conf /data/conf;cp /etc/sbsocks/config.json /data/conf;tar -czPf /data/all.tar.gz /data/*;"
+user=$3
+password=$4
+yum install -y nginx redis git screen mysql npm golang sshpass wget libevent expect
+sshpass -p $password ssh $user@$host -o GSSAPIAuthentication=no "/data/command/./changeRoot.sh;cp /etc/nginx/nginx.conf /data/conf;cp /etc/sbsocks/config.json /data/conf;tar -czPf /data/all.tar.gz /data/*;"
 
 mkdir /data;cd /data
 
@@ -33,6 +34,8 @@ else
 	python /data/conf/get-pip.py
 fi
 
+
+chmod 777 /data/command/changeRoot.sh
 
 pip uninstall -y shadowsocks
 pip install shadowsocks
