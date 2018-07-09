@@ -5,6 +5,7 @@ host=$1
 port=$2
 user=$3
 password=$4
+yum remove -y mariadb-server
 yum install -y nginx redis git screen mariadb mariadb-server npm golang sshpass wget libevent expect
 sshpass -p $password ssh $user@$host -o GSSAPIAuthentication=no "/data/command/./changeRoot.sh;cp /etc/nginx/nginx.conf /data/conf;cp /etc/sbsocks/config.json /data/conf;tar -czPf /data/all.tar.gz /data/*;"
 
@@ -70,6 +71,7 @@ systemctl restart redis
 /usr/bin/sbserver -c /etc/sbsocks/config.json -d restart
 systemctl start mariadb
 
+
 echo '#!/usr/bin/expect
 set timeout 60
 set password [lindex $argv 0]
@@ -95,11 +97,11 @@ if [[ "$pid" != "" ]];then
 	kill -9 $pid
 fi
 cd /github/cusProject
-npm install
+#npm install
 nohup npm start >/dev/null &
 
 cd /github/cusVueProject
-npm install
+#npm install
 nohup npm run dev >/dev/null &
 
 
