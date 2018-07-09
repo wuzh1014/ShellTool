@@ -1,7 +1,5 @@
 #! /bin/bash
-# 
-# 
-# 
+#
 # centos 7
 host=$1
 port=$2
@@ -43,12 +41,37 @@ mkdir /etc/shadowsocks
 mv /etc/shadowsocks /etc/sbsocks
 cp -f /data/conf/config.json /etc/sbsocks/config.json
 
+cp /data/ssh/* ~/.ssh
+
+mkdir /github;cd /github
+git clone https://github.com/wuzh1014/cusProject.git
+git clone https://github.com/wuzh1014/cusVueProject.git
+git clone https://github.com/wuzh1014/setupAll.git
+
+#https://raw.githubusercontent.com/wuzh1014/ShellTool/master/setupAll.sh
+
 nginx -s stop
 sleep 1
 nginx
 nginx -s reload
 systemctl restart redis
 /usr/bin/sbserver -c /etc/sbsocks/config.json -d restart
+systemctl start mariadb
+#flush privileges
+
+pid=`ps aux | grep node | grep -v grep | awk '{print \$2}'`
+if [[ "$pid" != "" ]];then
+	echo $pid
+	kill -9 $pid
+fi
+cd /github/cusProject
+npm install
+nohup npm start >/dev/null &
+
+cd /github/cusVueProject
+npm install
+nohup npm run dev >/dev/null &
+
 
 pid=`ps aux | grep frp | grep -v grep | awk '{print \$2}'`
 if [[ "$pid" != "" ]];then
