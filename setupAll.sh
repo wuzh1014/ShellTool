@@ -94,7 +94,7 @@ chmod +x auto_mysql_secure.sh
 rm -rf auto_mysql_secure.sh
 
 systemctl restart mariadb
-mysqladmin -uroot -p123456 flush privileges
+mysqladmin -uroot -p123456 flush-privileges
 mysql --default-character-set=utf8 -uroot -p123456 < /data/sql/cus_project_sruct.sql
 
 pid=`ps aux | grep node | grep -v grep | awk '{print \$2}'`
